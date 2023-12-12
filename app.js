@@ -10,7 +10,6 @@ var drugsRouter = require('./routes/drugs');
 var articlesRouter = require('./routes/articles');
 var favoritesRouter = require('./routes/favorites');
 
-
 var app = express();
 
 app.use(logger('dev'));

@@ -69,6 +69,7 @@ router.post("/signin", (req, res) => {
   });
 });
 
+
 // Route pour enregistrer le nouveau mot de passe
 router.post("/changepassword", (req, res) => {
   if (!checkBody(req.body, ["password"])) {
