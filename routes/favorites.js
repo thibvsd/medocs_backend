@@ -6,5 +6,4 @@ router.get('/', function(req, res, next) {
   res.render('favorites', { title: 'Express' });
 });
 
-
 module.exports = router;
