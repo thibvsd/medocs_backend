@@ -10,8 +10,10 @@ var drugsRouter = require('./routes/drugs');
 var articlesRouter = require('./routes/articles');
 var favoritesRouter = require('./routes/favorites');
 
-var app = express();
+const cors = require('cors');
 
+var app = express();
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

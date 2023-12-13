@@ -9,12 +9,17 @@ const bcrypt = require("bcrypt");
 
 //Route pour créer un nouvel utilisateur
 router.post("/signup", (req, res) => {
+  console.log(req.body)
   if (!checkBody(req.body, ["username", "email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
+
+
+  
   // Check si l'utilisateur n'est pas deja enregistre dans la base de données
   User.findOne({ username: req.body.username }).then((data) => {
+
     //si utilisateur non enregistré
     if (data === null) {
       // Regex pour vérifier le format de l'e-mail
