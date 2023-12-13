@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const { ObjectId } = require('mongoose').Types;
+
 
 const drugSchema = mongoose.Schema({
   drug_id : {type: mongoose.Schema.Types.ObjectId,

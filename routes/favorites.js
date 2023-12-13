@@ -1,12 +1,17 @@
 var express = require("express");
-const User = require("../../../medidoc_old copy/backend/medocs_backend/models/users");
+const User = require("../models/users");
+const Drug = require("../models/drugs");
+
 var router = express.Router();
+const mongoose = require('mongoose');
+const { ObjectId } = require('mongoose').Types;
+
 
 // Supprime un favori par id
-router.delete("/:token/:drug_id", async (req, res) => {
+router.delete("/:token/:_id", async (req, res) => {
   try {
     const userToken = req.params.token;
-    const drugId = req.params.drug_id;
+    const drugId = req.params._id;
     // Recherche de l'utilisateur par token
     const user = await User.findOne({ token: userToken });
     if (!user) {
@@ -26,10 +31,10 @@ router.delete("/:token/:drug_id", async (req, res) => {
 });
 
 // Ajoute un favori
-router.post("/:token/addFavorite/:drug_id", async (req, res) => {
+router.post("/:token/addFavorite/:_id", async (req, res) => {
   try {
     const userToken = req.params.token;
-    const drugId = req.params.drug_id;
+    const drugId = req.params._id;
     // Recherche de l'utilisateur par token
     const user = await User.findOne({ token: userToken });
     if (!user) {
@@ -55,20 +60,21 @@ router.post("/:token/addFavorite/:drug_id", async (req, res) => {
 
 
 // Vérifie si un favori est présent
-router.get("/:token/isFavorite/:drug_id", async (req, res) => {
+router.get("/isFavorite/:token/:_id", async (req, res) => {
   try {
     const userToken = req.params.token;
-    const drugId = req.params.drug_id;
+    const drugId = req.params._id;
 
-    // Recherche de l'utilisateur par token
-    const user = await User.findOne({ token: userToken });
+    // Recherche de l'utilisateur par token avec populate sur la clé étrangère 'favorites'
+    const user = await User.findOne({ token: userToken }).populate('favorites');
+console.log(user.favorites);
 
     if (!user) {
       return res.json({ result: false, error: "User not found" });
     }
 
     // Vérification si le médicament existe déjà dans les favoris
-    const isDrugFavorite = user.favorites.some(favoriteId => favoriteId.toString() === drugId);
+    const isDrugFavorite = user.favorites.some(favorite => favorite._id.toString() === drugId);
 
     res.json({ result: true, isFavorite: isDrugFavorite });
   } catch (error) {
