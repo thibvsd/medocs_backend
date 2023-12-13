@@ -69,6 +69,10 @@ router.post("/signin", (req, res) => {
   });
 });
 
+router.post("/addFavorites/:token", async(req, res) => {
+  const user = await User.updateOne({ token: req.params.token }, { favorites: req.body.favo })
+});
+
 
 // Route pour enregistrer le nouveau mot de passe
 // router.post("/changepassword", (req, res) => {
