@@ -1,7 +1,5 @@
 var express = require("express");
 const User = require("../models/users");
-const Drug = require("../models/drugs");
-
 var router = express.Router();
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;

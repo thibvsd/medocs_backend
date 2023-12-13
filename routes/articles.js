@@ -1,11 +1,14 @@
 var express = require('express');
 var router = express.Router();
+const User = require("../models/users");
+const Drug = require("../models/drugs");
+const Article = require("../models/articles");
 
 
 // Récupère la data actu d'un médoc grâce à l'ID du medoc
 router.get("/byId/:drug_id", (req, res) => {
    const drug_id = req.params.drug_id;
-  const drugArticles = data.filter(item => item.drug_id.includes(drug_id));
+  const drugArticles = Article.filter(item => item.drug_id.includes(drug_id));
   res.json({ drugArticles: drugArticles });
 });
 
@@ -41,7 +44,7 @@ router.get('/byLabel/:label', async (req, res) => {
 // Récupère la data actu d'une source spécifiée
 router.get("/byId/:source", (req, res) => {
   const source = req.params.source;
- const sourceArticles = data.filter(item => item.source.includes(source));
+ const sourceArticles = Article.filter(item => item.source.includes(source));
  res.json({ sourceArticles: sourceArticles });
 });
 
@@ -50,7 +53,7 @@ router.get("/byKeyword/:keyword", (req, res) => {
   // Convertit le mot-clé en minuscules pour une recherche insensible à la casse
   const keyword = req.params.keyword.toLowerCase(); 
   // Filtre les articles dont le contenu contient le mot-clé
-  const keywordArticles = data.filter(item => item.content.toLowerCase().includes(keyword));
+  const keywordArticles = Article.filter(item => item.content.toLowerCase().includes(keyword));
   res.json({ keywordArticles: keywordArticles });
 });
 
