@@ -2,6 +2,17 @@ var express = require('express');
 var router = express.Router();
 const Drug = require("../models/drugs");
 
+// Récupère les noms des medocs
+router.get('/allNames', (req, res) => {
+  Drug.find().then(data => {
+    const names = data.map(drug => drug.name);
+    res.json({ names });
+  }).catch(error => {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  });
+});
+
 // Récupère la data grâce à l'ID du medoc
 router.get("/byId/:id", async (req, res) => {
   try {
