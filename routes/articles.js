@@ -55,4 +55,19 @@ router.get("/byKeyword/:keyword", (req, res) => {
 });
 
 
+// Route pour récupérer les 3 dernières actualités par date
+router.get('/latestNews', async (req, res) => {
+  try {
+    // Utilisation de la méthode sort pour trier les articles par date de manière décroissante
+    // Ensuite, limit(3) récupère seulement les trois premiers
+    const latestNews = await Article.find({}).sort({ date: -1 }).limit(3).exec();
+
+    res.json({ latestNews });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+
 module.exports = router;
