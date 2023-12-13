@@ -9,17 +9,14 @@ const bcrypt = require("bcrypt");
 
 //Route pour créer un nouvel utilisateur
 router.post("/signup", (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   if (!checkBody(req.body, ["username", "email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
 
-
-  
   // Check si l'utilisateur n'est pas deja enregistre dans la base de données
   User.findOne({ username: req.body.username }).then((data) => {
-
     //si utilisateur non enregistré
     if (data === null) {
       // Regex pour vérifier le format de l'e-mail
@@ -29,11 +26,11 @@ router.post("/signup", (req, res) => {
         res.json({ result: false, error: "Invalid email format" });
         return;
       }
-      if(req.body.age > 120 || req.body.age < 0) {
+      if (req.body.age > 120 || req.body.age < 0) {
         res.json({ result: false, error: "Invalid age" });
         return;
       }
-      if(req.body.weight > 300 || req.body.weight < 0) {
+      if (req.body.weight > 300 || req.body.weight < 0) {
         res.json({ result: false, error: "Invalid weight" });
         return;
       }
@@ -74,10 +71,18 @@ router.post("/signin", (req, res) => {
   });
 });
 
-router.post("/addFavorites/:token", async(req, res) => {
-  const user = await User.updateOne({ token: req.params.token }, { favorites: req.body.favo })
+router.post("/addFavorites/:token", async (req, res) => {
+  const user = await User.updateOne(
+    { token: req.params.token },
+    { $push: { favorites: req.body.favo } }
+  )
+    .then(() => {
+      res.json({ result: true });
+    })
+    .catch((err) => {
+      res.json({ result: false });
+    });
 });
-
 
 // Route pour enregistrer le nouveau mot de passe
 // router.post("/changepassword", (req, res) => {
@@ -93,7 +98,5 @@ router.post("/addFavorites/:token", async(req, res) => {
 //       res.json({ result: true, token: data.token });
 //   }})
 // });
-
-
 
 module.exports = router;

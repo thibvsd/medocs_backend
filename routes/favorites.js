@@ -29,10 +29,10 @@ router.delete("/:token/:_id", async (req, res) => {
 });
 
 // Ajoute un favori
-router.post("/:token/addFavorite/:_id", async (req, res) => {
+router.post("/addFavorite/:token", async (req, res) => {
   try {
     const userToken = req.params.token;
-    const drugId = req.params._id;
+    const drugId = req.body._id;
     // Recherche de l'utilisateur par token
     const user = await User.findOne({ token: userToken });
     if (!user) {
