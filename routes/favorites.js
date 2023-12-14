@@ -94,4 +94,20 @@ console.log(user.favorites);
   }
 });
 
+// Récupère tout les favoris d'un utilisateur
+router.get("/loadFavorite/:token", async (req, res) => {
+  try {
+    const userToken = req.params.token;
+
+    // Recherche des favoris d'un utilisateur par token avec populate sur la clé étrangère 'favorites'
+    const favorites = await User.findOne({ token: userToken }).populate('favorites');
+
+    res.json({ result: true, favorites: favorites });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
+
