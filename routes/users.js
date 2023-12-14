@@ -81,26 +81,27 @@ router.get("/details/:token", (req, res) => {
   });
 });
 
-router.post("/settings/:token", (req, res) => {
+
+// Route pour mettre à jour les données utilisateur
+router.post("/settings/:token", async (req, res) => {
   const { username, email, age, weight } = req.body;
 
-  // Vous pouvez utiliser ces valeurs pour mettre à jour les données de l'utilisateur dans votre base de données
-  // Ici, je vais simuler une réponse pour montrer comment vous pourriez répondre à cette requête
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { token: req.params.token },
+      { $set: { username, email, age, weight } },
+      { new: true }
+    );
 
-  // Exemple de mise à jour des données en utilisant Mongoose (mais cela peut varier selon votre configuration de base de données)
-  // Supposons que vous ayez un modèle User avec ces champs
-  User.findOneAndUpdate(
-    { token: req.params.token },
-    { $set: { username, email, age, weight } },
-    { new: true },
-    (err, updatedUser) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Erreur lors de la mise à jour des données utilisateur" });
-      }
-      return res.status(200).json({ message: "Données utilisateur mises à jour avec succès", updatedUser });
+    if (!updatedUser) {
+      return res.status(404).json({ error: "Utilisateur introuvable" });
     }
-  );
+
+    return res.status(200).json({ message: "Données utilisateur mises à jour avec succès", updatedUser });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Erreur lors de la mise à jour des données utilisateur" });
+  }
 });
 
 // Route pour enregistrer le nouveau mot de passe

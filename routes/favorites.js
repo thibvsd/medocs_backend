@@ -1,8 +1,7 @@
 var express = require("express");
 const User = require("../models/users");
 var router = express.Router();
-const mongoose = require('mongoose');
-const { ObjectId } = require('mongoose').Types;
+
 
 
 // Supprime un favori par id
@@ -100,9 +99,9 @@ router.get("/loadFavorite/:token", async (req, res) => {
     const userToken = req.params.token;
 
     // Recherche des favoris d'un utilisateur par token avec populate sur la clé étrangère 'favorites'
-    const favorites = await User.findOne({ token: userToken }).populate('favorites');
+    const data = await User.findOne({ token: userToken }).populate('favorites');
 
-    res.json({ result: true, favorites: favorites });
+    res.json({ result: true, favorites: data.favorites });
   } catch (error) {
     console.error(error);
     res.status(500).json({ result: false, error: "Internal Server Error" });
