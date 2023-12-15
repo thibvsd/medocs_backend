@@ -43,6 +43,14 @@ router.post("/signup", (req, res) => {
         age: req.body.age,
         weight: req.body.weight,
         token: uid2(32),
+        treatment: {
+          med_reason: "",
+          drugs: [],
+          prescription: [],
+        },
+        favorites: [],
+        search: [],
+        
       });
 
       newUser.save().then((newDoc) => {

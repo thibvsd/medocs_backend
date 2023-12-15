@@ -29,7 +29,7 @@ const userSchema = mongoose.Schema({
     ref: 'drugs',}],
   search: [{type: mongoose.Schema.Types.ObjectId,
     ref: 'drugs',}],
-  treatment: [treatmentSchema],
+  treatment: treatmentSchema,
 });
 
 
