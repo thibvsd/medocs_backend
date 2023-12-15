@@ -73,4 +73,24 @@ router.get('/latestNews', async (req, res) => {
 });
 
 
+// route pour envoyer des nouveaux articles pour pouvoir tester (inutile à terme)
+router.post('/newArticle', async (req, res) => {
+  try {
+    const newArticle = new Article({
+    title: req.body.title,
+  date: req.body.date,
+  source: req.body.source,
+  content: req.body.content,
+  illustration: req.body.img,
+  url: req.body.url,
+  drug_id: req.body._id});
+    await newArticle.save();
+    res.json({ message: 'Article ajoute avec succes' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  } 
+})
+
+
 module.exports = router;
