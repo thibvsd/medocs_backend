@@ -9,6 +9,8 @@ var usersRouter = require('./routes/users');
 var drugsRouter = require('./routes/drugs');
 var articlesRouter = require('./routes/articles');
 var favoritesRouter = require('./routes/favorites');
+var searchesRouter = require('./routes/searches');
+var treatmentsRouter = require('./routes/treatments');
 
 const cors = require('cors');
 
@@ -25,5 +27,7 @@ app.use('/users', usersRouter);
 app.use('/drugs', drugsRouter);
 app.use('/favorites', favoritesRouter);
 app.use('/articles', articlesRouter);
+app.use('/searches', searchesRouter);
+app.use('/treatments', treatmentsRouter);
 
 module.exports = app;

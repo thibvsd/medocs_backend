@@ -5,8 +5,8 @@ const Drug = require("../models/drugs");
 // Récupère les noms des medocs
 router.get('/allNames', (req, res) => {
   Drug.find().then(data => {
-    const names = data.map(drug => drug.name);
-    res.json({ names });
+    const namesAndId = data.map(drug => ({ name: drug.name, _id: drug._id }));
+    res.json({ namesAndId });
   }).catch(error => {
     console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
