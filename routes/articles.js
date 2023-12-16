@@ -58,14 +58,24 @@ router.get("/byKeyword/:keyword", (req, res) => {
 });
 
 
-// Route pour récupérer les 3 dernières actualités par date
+// Route pour récupérer les 3 dernières actualités par date 
 router.get('/latestNews', async (req, res) => {
   try {
     // Utilisation de la méthode sort pour trier les articles par date de manière décroissante
     // Ensuite, limit(3) récupère seulement les trois premiers
-    const latestNews = await Article.find({}).sort({ date: -1 }).limit(3).exec();
-
+    const latestNews = await Article.aggregate([
+      {
+        $group: {
+          _id: '$url', // Regroupement par URL
+          latestArticle: { $first: '$$ROOT' } // Sélection du 1er article de chaque groupe
+        }
+      },
+      { $replaceRoot: { newRoot: '$latestArticle' } }, // Remplacer la racine du document par l'article sélectionné
+      { $sort: { date: -1 } }, // Tri par date décroissante
+      { $limit: 3 }
+    ]).exec();
     res.json({ latestNews });
+    console.log("back", latestNews)
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });

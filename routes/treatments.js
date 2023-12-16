@@ -74,7 +74,7 @@ router.post("/addMedReason/:token", async (req, res) => {
   }
 });
 
-// Récupère les traitements d'un utilisateur => !!!! A TESTER
+// Récupère les traitements d'un utilisateur
 
 router.get("/:token", async (req, res) => {
   try {

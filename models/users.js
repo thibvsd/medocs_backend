@@ -18,6 +18,16 @@ const treatmentSchema = mongoose.Schema({
   prescription: [prescriptionSchema],
  });
 
+ const favoritesSchema = mongoose.Schema({
+  drug_id : {type: mongoose.Schema.Types.ObjectId,
+    ref: 'drugs',}
+});
+
+ const searchSchema = mongoose.Schema({
+  drug_id : {type: mongoose.Schema.Types.ObjectId,
+    ref: 'drugs',}
+});
+
 const userSchema = mongoose.Schema({
   username: String,
   password: String,
@@ -25,10 +35,8 @@ const userSchema = mongoose.Schema({
   age: Number,
   weight: Number,
   token: String,
-  favorites: [{type: mongoose.Schema.Types.ObjectId,
-    ref: 'drugs',}],
-  search: [{type: mongoose.Schema.Types.ObjectId,
-    ref: 'drugs',}],
+  favorites: [favoritesSchema],
+  search: [searchSchema],
   treatment: treatmentSchema,
 });
 

@@ -9,7 +9,7 @@ router.post("/addLastSearch/:token", async (req, res) => {
     {
       $push: {
         search: {
-          $each: [req.body._id],
+          $each: [{drug_id: req.body._id}],
           $position: 0, // Ajoute au début de la liste
           $slice: 5, // Garde au maximum 5 éléments
         },
@@ -30,10 +30,9 @@ router.post("/addLastSearch/:token", async (req, res) => {
 router.get("/last5Searches/:token", async (req, res) => {
   try {
     const userToken = req.params.token;
-
     // Recherche des favoris d'un utilisateur par token avec populate sur la clé étrangère 'favorites'
-    const data = await User.findOne({ token: userToken }).populate('search');
-
+    const data = await User.findOne({ token: userToken }).populate('search.drug_id');
+console.log(data)
     res.json({ result: true, search: data.search });
   } catch (error) {
     console.error(error);

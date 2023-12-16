@@ -7,7 +7,6 @@ router.get('/allNames', (req, res) => {
   Drug.find().then(data => {
     const namesAndId = data.map(drug => ({ name: drug.name, _id: drug._id }));
     res.json({ namesAndId });
-    console.log("route",namesAndId);
   }).catch(error => {
     console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
