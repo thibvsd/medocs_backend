@@ -4,7 +4,7 @@ const Drug = require("../models/drugs");
 
 // Récupère les noms des medocs
 router.get('/allNames', (req, res) => {
-  Drug.find().then(data => {
+  Drug.find().limit(3).then(data => {
     const namesAndId = data.map(drug => ({ name: drug.name, _id: drug._id }));
     res.json({ namesAndId });
   }).catch(error => {
