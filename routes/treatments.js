@@ -47,8 +47,47 @@ router.delete("/deleteDrugTreatment/:token/", async (req, res) => {
 
 
 // Route qui enregistre une ordonnance
+router.post("/addPrescription/:token", async (req, res) => {
+  try {
+    // Vérifie si l'utilisateur est connecté
+    const user = await User.findOne({ token: req.params.token });
+    if (!user) {
+      return res.json({ result: false, error: "Utilisateur non connecté" });
+    }
+    const prescriptionTreatment = { presc_img: req.body.presc_img };
+    console.log(user.treatement);
+    user.treatment.prescription.push(prescriptionTreatment);
+
+    await user.save();
+
+    res.json({ result: true, prescriptionTreatment: user.treatment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: "Internal Server Error" });
+  }
+});
 
 // Route qui supprime une ordonnance
+router.delete("/deletePrescription/:token/", async (req, res) => {
+  try {
+    const prescImg = req.presc_img;
+    // Recherche de l'utilisateur par token
+    const user = await User.findOne({ token: req.params.token });
+    if (!user) {
+      return res.json({ result: false, error: "Utilisateur non connecté" });
+    }
+    // Suppression de l'ordonnance
+    user.treatment.prescription = user.treatment.prescription.filter(
+      (prescriptionTreatment) => prescriptionTreatment.presc_img.toString() !== prescImg
+    );
+    
+    await user.save();
+    res.json({ result: true, prescriptionTreatment: user.treatment.prescription });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: "Internal Server Error" });
+  }
+});
 
 
 // Route qui met à jour la raison médicale (quand clique sur Save en bas sur TreatmentsScreen)
