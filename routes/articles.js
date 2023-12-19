@@ -109,4 +109,32 @@ router.post('/newArticle', async (req, res) => {
 })
 
 
+// Définis la route pour récupérer toutes les sources
+router.get('/sources', async (req, res) => {
+  try {
+    // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
+    const sources = await Article.distinct('source');
+    
+    // Renvoie la liste des sources en réponse
+    res.json({ result: true, sources });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: 'Internal Server Error' });
+  }
+});
+
+// Définis la route pour récupérer toutes les sources
+router.get('/labels', async (req, res) => {
+  try {
+    // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
+    const labels = await Classification.distinct('label');
+    
+    // Renvoie la liste des sources en réponse
+    res.json({ result: true, labels });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;

@@ -34,10 +34,12 @@ router.get("/byId/:id", async (req, res) => {
 router.get("/byName/:name", async (req, res) => {
   try {
     const name = req.params.name;
-    if (name.length < 5) {
+    if (name.length < 3) {
       return res.status(400).json({ message: 'Saisie insuffisante' });
     }
     const donneesDrug = await Drug.find({ name: { $regex: new RegExp(name, 'i') } });
+    console.log(donneesDrug)
+
     // Map pour alléger la réponse et n'extraire que les name et ID :
     const drugsFound = donneesDrug.map(({ _id, name }) => ({ _id, name }));
     res.json(drugsFound);
