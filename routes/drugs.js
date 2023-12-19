@@ -4,14 +4,20 @@ const Drug = require("../models/drugs");
 
 // Récupère les noms des medocs
 router.get('/allNames', (req, res) => {
-  Drug.find().limit(3).then(data => {
+  Drug.find().limit(10).then(data => {
     const namesAndId = data.map(drug => ({ name: drug.name, _id: drug._id }));
     res.json({ namesAndId });
-  }).catch(error => {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur serveur' });
-  });
+  })
 });
+
+
+// Récupère les noms des medocs avec 3 caractères saisis
+router.get('/query3characters/:query', async (req, res) => {
+  const regex = new RegExp(`${req.params.query}`, 'i'); // Regex pour rechercher les noms commençant par la requête
+  const data = await Drug.find({ name: regex }, 'name _id').limit(10);
+    const namesAndId = data.map(drug => ({ name: drug.name, _id: drug._id }));
+    res.json({ namesAndId });
+  });
 
 // Récupère la data grâce à l'ID du medoc
 router.get("/byId/:id", async (req, res) => {
@@ -34,7 +40,7 @@ router.get("/byName/:name", async (req, res) => {
     const donneesDrug = await Drug.find({ name: { $regex: new RegExp(name, 'i') } });
     // Map pour alléger la réponse et n'extraire que les name et ID :
     const drugsFound = donneesDrug.map(({ _id, name }) => ({ _id, name }));
-    res.json({drugsFound: drugsFound});
+    res.json(drugsFound);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
