@@ -10,6 +10,7 @@ router.get('/allNames', (req, res) => {
   })
 });
 
+
 // Récupère les noms des medocs avec 3 caractères saisis
 router.get('/query3characters/:query', async (req, res) => {
   const regex = new RegExp(`${req.params.query}`, 'i'); // Regex pour rechercher les noms commençant par la requête
