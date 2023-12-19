@@ -45,7 +45,6 @@ router.delete("/deleteDrugTreatment/:token/", async (req, res) => {
   }
 });
 
-
 // Route qui enregistre une ordonnance
 router.post("/addPrescription/:token", async (req, res) => {
   try {
