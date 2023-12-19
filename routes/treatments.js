@@ -45,15 +45,88 @@ router.delete("/deleteDrugTreatment/:token/", async (req, res) => {
   }
 });
 
-
 // Route qui enregistre une ordonnance
+router.post("/addPrescription/:token", async (req, res) => {
+  try {
+    // Vérifie si l'utilisateur est connecté
+    const user = await User.findOne({ token: req.params.token });
+    if (!user) {
+      return res.json({ result: false, error: "Utilisateur non connecté" });
+    }
+    const prescriptionTreatment = { presc_img: req.body.presc_img };
+    console.log(user.treatement);
+    user.treatment.prescription.push(prescriptionTreatment);
+
+    await user.save();
+
+    res.json({ result: true, prescriptionTreatment: user.treatment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: "Internal Server Error" });
+  }
+});
 
 // Route qui supprime une ordonnance
+router.delete("/deletePrescription/:token/", async (req, res) => {
+  try {
+    const prescImg = req.presc_img;
+    // Recherche de l'utilisateur par token
+    const user = await User.findOne({ token: req.params.token });
+    if (!user) {
+      return res.json({ result: false, error: "Utilisateur non connecté" });
+    }
+    // Suppression de l'ordonnance
+    user.treatment.prescription = user.treatment.prescription.filter(
+      (prescriptionTreatment) => prescriptionTreatment.presc_img.toString() !== prescImg
+    );
+    
+    await user.save();
+    res.json({ result: true, prescriptionTreatment: user.treatment.prescription });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: "Internal Server Error" });
+  }
+});
 
 
 // Route qui met à jour la raison médicale (quand clique sur Save en bas sur TreatmentsScreen)
 // !!! A METTRE A JOUR POUR QUE CA SAUVEGARDE EGALEMENT LE DOSAGE 
-router.post("/addMedReason/:token", async (req, res) => {
+router.post("/saveTreatment/:token", async (req, res) => {
+  try {
+    const user = await User.findOne({ token: req.params.token }).populate("treatment.drugs");
+    console.log(user.treatment);
+
+    if (!user) {
+      return res.json({ result: false, error: "Utilisateur non connecté" });
+    }
+
+    // Met à jour la raison médicale avec la nouvelle valeur
+    user.treatment.med_reason = req.body.med_reason;
+    // console.log("la: " + user.treatment.drugs.find(
+    //   (drug) => drug.drug_id === req.body.drug_id
+    // ));
+    // user.treatment.drugs.find(
+    //   (drug) => String(drug.drug_id) === req.body.drug_id
+    // ).daily_presc = req.body.daily_presc;
+
+    req.body.drugs.forEach((updatedDrug) => {
+      const foundDrug = user.treatment.drugs.find(
+        (drug) => String(drug.drug_id) === updatedDrug.drug_id
+      );
+        foundDrug.daily_presc = updatedDrug.daily_presc;
+    });
+
+    // Sauvegarde les modifications
+    await user.save();
+
+    res.json({ result: true, medReason: user.treatment.med_reason });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ result: false, error: "Internal Server Error" });
+  }
+});
+
+router.post("/updateDrugTreatment/:token", async (req, res) => {
   try {
     const user = await User.findOne({ token: req.params.token });
 
@@ -61,7 +134,7 @@ router.post("/addMedReason/:token", async (req, res) => {
       return res.json({ result: false, error: "Utilisateur non connecté" });
     }
 
-    // Met à jour la raison médicale avec la nouvelle valeur
+    // Met à jour le dosage du médicament
     user.treatment.med_reason = req.body.med_reason;
 
     // Sauvegarde les modifications
