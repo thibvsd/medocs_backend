@@ -2,31 +2,37 @@ var express = require("express");
 const User = require("../models/users");
 var router = express.Router();
 
+
 // Route qui enregistre la dernière recherche de médicament
 router.post("/addLastSearch/:token", async (req, res) => {
-  const user = await User.updateOne(
-    { token: req.params.token },
-    {
-      $push: {
-        search: {
-          $each: [{drug_id: req.body._id}],
-          $position: 0, // Ajoute au début de la liste
-          $slice: 5, // Garde au maximum 5 éléments
-        },
-      },
-    }
-  )
+  const user = await User.findOne({ token: req.params.token });
+
+  // Vérifie si l'ID du médicament est déjà présent dans la liste search
+  const isIdAlreadyInSearch = user.search.some((item) => item.drug_id === req.body._id);
+
+  if (isIdAlreadyInSearch) {
+    // Si l'ID est déjà enregistré, renvoie une réponse sans effectuer de modifications
+    return res.json({ result: true, message: "ID déjà présent dans la liste search" });
+  }
+
+  // Ajoute l'ID au début de la liste en limitant à 5 éléments
+  user.search.unshift({ drug_id: req.body._id });
+  user.search = user.search.slice(0, 5);
+
+  // Sauvegarde les modifications dans la base de données
+  user.save()
     .then(() => {
       res.json({ result: true });
     })
     .catch((err) => {
-      res.json({ result: false });
+      res.json({ result: false, error: err.message });
     });
 });
 
 
 
-// Récupère les 5 dernières recherches d'un utilisateur
+
+// Route qui récupère les 5 dernières recherches d'un utilisateur
 router.get("/last5Searches/:token", async (req, res) => {
   try {
     const userToken = req.params.token;

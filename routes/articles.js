@@ -6,12 +6,18 @@ const Article = require("../models/articles");
 
 
 // Récupère la data actu d'un médoc grâce à l'ID du medoc
-router.get("/byId/:drug_id", (req, res) => {
-   const drug_id = req.params.drug_id;
-  const drugArticles = Article.filter(item => item.drug_id.includes(drug_id));
-  res.json({ drugArticles: drugArticles });
-});
+router.get("/byId/:drug_id", async (req, res) => {
+  const drug_id = req.params.drug_id;
+  try {
+    // Utilisation de find pour récupérer tous les documents qui correspondent à l'ID du médicament
+    const articlesById = await Article.find({ drug_id: drug_id });
 
+    res.json({ drugArticles: articlesById });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
 
 // Récupère la data actu d'une famille de médocs (="label" de la collection classification)
 router.get('/byLabel/:label', async (req, res) => {
