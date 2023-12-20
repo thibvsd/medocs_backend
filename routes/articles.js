@@ -3,6 +3,8 @@ var router = express.Router();
 const User = require("../models/users");
 const Drug = require("../models/drugs");
 const Article = require("../models/articles");
+const Classification = require("../models/classifications");
+
 
 
 // Récupère la data actu d'un médoc grâce à l'ID du medoc
@@ -20,9 +22,9 @@ router.get("/byId/:drug_id", async (req, res) => {
 });
 
 // Récupère la data actu d'une famille de médocs (="label" de la collection classification)
-router.get('/byLabel/:label', async (req, res) => {
+router.get('/byLabel/', async (req, res) => {
   try {
-    const label = req.params.label;
+    const label = req.body.label;
 
     // Utilisation de populate pour récupérer les données et les stocker dans articlesByLabel
     const articlesByLabel = await Article.find({}).populate({
@@ -48,19 +50,34 @@ router.get('/byLabel/:label', async (req, res) => {
 
 
 // Récupère la data actu d'une source spécifiée
-router.get("/byId/:source", (req, res) => {
-  const source = req.params.source;
- const sourceArticles = Article.filter(item => item.source.includes(source));
- res.json({ sourceArticles: sourceArticles });
+router.get("/bySource/:source", async (req, res) => {
+  try {
+    const source = req.params.source;
+
+    // Utilisez la méthode find de Mongoose pour récupérer les articles de la source spécifiée
+    const sourceArticles = await Article.find({ source: { $regex: source, $options: 'i' } });
+
+    res.json({ sourceArticles: sourceArticles });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 // Récupère tous les articles dont le contenu contient le mot-clé
-router.get("/byKeyword/:keyword", (req, res) => {
-  // Convertit le mot-clé en minuscules pour une recherche insensible à la casse
-  const keyword = req.params.keyword.toLowerCase(); 
-  // Filtre les articles dont le contenu contient le mot-clé
-  const keywordArticles = Article.filter(item => item.content.toLowerCase().includes(keyword));
-  res.json({ keywordArticles: keywordArticles });
+router.get("/byKeyword/:keyword", async (req, res) => {
+  try {
+    // Convertit le mot-clé en minuscules pour une recherche insensible à la casse
+    const keyword = req.params.keyword.toLowerCase(); 
+
+    // Utilisez la méthode find de Mongoose pour récupérer les articles contenant le mot-clé dans le champ content
+    const keywordArticles = await Article.find({ content: { $regex: keyword, $options: 'i' } });
+
+    res.json({ keywordArticles: keywordArticles });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 
@@ -124,7 +141,7 @@ router.get('/sources', async (req, res) => {
 });
 
 // Définis la route pour récupérer toutes les sources
-router.get('/labels', async (req, res) => {
+router.get('/labels/', async (req, res) => {
   try {
     // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
     const labels = await Classification.distinct('label');
