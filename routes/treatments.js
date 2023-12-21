@@ -140,7 +140,7 @@ router.post("/updateDrugTreatment/:token", async (req, res) => {
     // Sauvegarde les modifications
     await user.save();
 
-    res.json({ result: true, medReason: user.treatment.med_reason });
+    res.json({ result: true, medReason: user.treatment.med_reason, validation:"Données enregistrées avec succès !" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ result: false, error: "Internal Server Error" });
