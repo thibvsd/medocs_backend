@@ -5,6 +5,8 @@ const Drug = require("../models/drugs");
 const Article = require("../models/articles");
 const Classification = require("../models/classifications");
 
+
+
 // Récupère la data actu d'un médoc grâce à l'ID du medoc
 router.get("/byId/:drug_id", async (req, res) => {
   const drug_id = req.params.drug_id;
@@ -22,7 +24,7 @@ router.get("/byId/:drug_id", async (req, res) => {
 // Récupère la data actu d'une famille de médocs (="label" de la collection classification)
 router.get("/byLabel/:label", async (req, res) => {
   try {
-    const label = req.params.label;
+    const label = req.body.label;
 
     // Utilisation de populate pour récupérer les données et les stocker dans articlesByLabel
     const articlesByLabel = await Article.find({})
@@ -49,6 +51,12 @@ router.get("/byLabel/:label", async (req, res) => {
 });
 
 // Récupère la data actu d'une source spécifiée
+router.get("/byId/:source", (req, res) => {
+  const source = req.params.source;
+ const sourceArticles = Article.filter(item => item.source.includes(source));
+ res.json({ sourceArticles: sourceArticles });
+});
+
 // Récupère tous les articles dont le contenu contient le mot-clé
 router.get("/bySourceAndKeyword/:source/:keyword", async (req, res) => {
   try {
@@ -148,7 +156,7 @@ router.get("/sources", async (req, res) => {
 });
 
 // Définis la route pour récupérer toutes les sources
-router.get("/labels", async (req, res) => {
+router.get('/labels', async (req, res) => {
   try {
     // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
     const labels = await Classification.distinct("label", {

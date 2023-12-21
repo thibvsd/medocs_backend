@@ -15,12 +15,13 @@ router.delete("/deleteFavorite/:token/:_id", async (req, res) => {
       return res.json({ result: false, error: "User not found" });
     }
     // Suppression de l'ID du médicament dans le tableau des favoris
+    console.log(user.favorites)
     user.favorites = user.favorites.filter(
-      (favoriteId) => favoriteId.toString() !== drugId
+      (favoriteId) => favoriteId.toString() == !drugId
     );
     // Enregistrement de l'utilisateur mis à jour
     await user.save();
-    res.json({ result: true, favorites: userfavorites });
+    res.json({ result: true, favorites: user.favorites });
   } catch (error) {
     console.error(error);
     res.status(500).json({ result: false, error: "Internal Server Error" });
