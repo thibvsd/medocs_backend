@@ -49,34 +49,41 @@ router.get("/byLabel/:label", async (req, res) => {
 });
 
 // Récupère la data actu d'une source spécifiée
-router.get("/bySource/:source", async (req, res) => {
+// Récupère tous les articles dont le contenu contient le mot-clé
+router.get("/bySourceAndKeyword/:source/:keyword", async (req, res) => {
   try {
     const source = req.params.source;
-
-    // Utilisez la méthode find de Mongoose pour récupérer les articles de la source spécifiée
-    const sourceArticles = await Article.find({
-      source: { $regex: source, $options: "i" },
-    });
-
-    res.json({ sourceArticles: sourceArticles });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-// Récupère tous les articles dont le contenu contient le mot-clé
-router.get("/byKeyword/:keyword", async (req, res) => {
-  try {
-    // Convertit le mot-clé en minuscules pour une recherche insensible à la casse
     const keyword = req.params.keyword.toLowerCase();
 
-    // Utilisez la méthode find de Mongoose pour récupérer les articles contenant le mot-clé dans le champ content
-    const keywordArticles = await Article.find({
-      content: { $regex: keyword, $options: "i" },
-    });
+    let query = {};
 
-    res.json({ keywordArticles: keywordArticles });
+    if (source !== "undefined" && keyword !== "undefined") {
+      // Les deux filtres sont appliqués
+      query = {
+        source: { $regex: source, $options: "i" },
+        $or: [
+          { content: { $regex: keyword, $options: "i" } },
+          { title: { $regex: keyword, $options: "i" } },
+        ],
+      };
+    } else if (source !== "undefined") {
+      // Seulement le filtre source est appliqué
+      query = { source: { $regex: source, $options: "i" } };
+    } else if (keyword !== "undefined") {
+      // Seulement le filtre mot-clé est appliqué
+      query = {
+        $or: [
+          { content: { $regex: keyword, $options: "i" } },
+          { title: { $regex: keyword, $options: "i" } },
+        ],
+      };
+    } else {
+      // Aucun filtre n'est appliqué, récupérer tous les articles
+      query = {};
+    }
+
+    const combinedArticles = await Article.find(query);
+    res.json({ combinedArticles: combinedArticles });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -161,16 +168,18 @@ router.get("/labels", async (req, res) => {
 router.get("/codes", async (req, res) => {
   try {
     // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
-    const codes = await Classification.find({
-      $and: [
-        { $expr: { $eq: [ { $strLenCP: "$code" }, 1 ] } },
-        { code: { $nin: ["v", "z"] } }
-      ]
-    },
-    {
-      _id: 0, // Exclut le champ _id du résultat
-      label: 1 // Inclut uniquement le champ label dans le résultat
-    }).sort({ label: 1 });
+    const codes = await Classification.find(
+      {
+        $and: [
+          { $expr: { $eq: [{ $strLenCP: "$code" }, 1] } },
+          { code: { $nin: ["v", "z"] } },
+        ],
+      },
+      {
+        _id: 0, // Exclut le champ _id du résultat
+        label: 1, // Inclut uniquement le champ label dans le résultat
+      }
+    ).sort({ label: 1 });
     console.log("back", codes);
     // Renvoie la liste des sources en réponse
     res.json({ result: true, codes });
