@@ -2,8 +2,6 @@ var express = require("express");
 const User = require("../models/users");
 var router = express.Router();
 
-
-
 // Supprime un favori par id
 router.delete("/deleteFavorite/:token/:_id", async (req, res) => {
   try {
@@ -15,13 +13,23 @@ router.delete("/deleteFavorite/:token/:_id", async (req, res) => {
       return res.json({ result: false, error: "User not found" });
     }
     // Suppression de l'ID du médicament dans le tableau des favoris
-    console.log(user.favorites)
     user.favorites = user.favorites.filter(
-      (favoriteId) => favoriteId.drug_id.toString() == !drugId
+      (favoriteId) => favoriteId.drug_id.toString() !== drugId.toString()
     );
     // Enregistrement de l'utilisateur mis à jour
-    await user.save();
-    res.json({ result: true, favorites: user.favorites });
+    const userSaved = await user.save();
+
+    const majUser = await User.findOne({ token: userToken }).populate({
+      path: "favorites.drug_id",
+      select: "_id name", // Sélectionne uniquement les champs _id et name
+    });
+    const filteredData = majUser.favorites.map((favorite) => {
+      return {
+        _id: favorite.drug_id._id,
+        name: favorite.drug_id.name,
+      };
+    });
+    res.json({ result: true, favorites: filteredData });
   } catch (error) {
     console.error(error);
     res.status(500).json({ result: false, error: "Internal Server Error" });
@@ -34,16 +42,15 @@ router.post("/addFavorites/:token", async (req, res) => {
   user.favorites.unshift({ drug_id: req.body.favo });
 
   // Sauvegarde les modifications dans la base de données
-  user.save()
+  user
+    .save()
     .then(() => {
       res.json({ result: true });
     })
     .catch((err) => {
       res.json({ result: false, error: err.message });
-    });}
-);
-
-
+    });
+});
 
 // Vérifie si un favori est présent
 router.get("/isFavorite/:token/:_id", async (req, res) => {
@@ -52,14 +59,16 @@ router.get("/isFavorite/:token/:_id", async (req, res) => {
     const drugId = req.params._id;
 
     // Recherche de l'utilisateur par token avec populate sur la clé étrangère 'favorites'
-    const user = await User.findOne({ token: userToken }).populate('favorites');
+    const user = await User.findOne({ token: userToken }).populate("favorites");
 
     if (!user) {
       return res.json({ result: false, error: "User not found" });
     }
 
     // Vérification si le médicament existe déjà dans les favoris
-    const isDrugFavorite = user.favorites.some(favorite => favorite._id.toString() === drugId);
+    const isDrugFavorite = user.favorites.some(
+      (favorite) => favorite._id.toString() === drugId
+    );
 
     res.json({ result: true, isFavorite: isDrugFavorite });
   } catch (error) {
@@ -68,8 +77,6 @@ router.get("/isFavorite/:token/:_id", async (req, res) => {
   }
 });
 
-
-
 // Récupère tout les favoris d'un utilisateur
 router.get("/loadFavorite/:token", async (req, res) => {
   try {
@@ -77,8 +84,8 @@ router.get("/loadFavorite/:token", async (req, res) => {
 
     // Recherche des favoris d'un utilisateur par token avec populate sur la clé étrangère 'favorites'
     const data = await User.findOne({ token: userToken }).populate({
-      path: 'favorites.drug_id',
-      select: '_id name', // Sélectionne uniquement les champs _id et name
+      path: "favorites.drug_id",
+      select: "_id name", // Sélectionne uniquement les champs _id et name
     });
     console.log("data route favorite", data);
 
@@ -90,13 +97,11 @@ router.get("/loadFavorite/:token", async (req, res) => {
       };
     });
 
-    res.json({ result: true, idAndName:idAndName });
+    res.json({ result: true, idAndName: idAndName });
   } catch (error) {
     console.error(error);
     res.status(500).json({ result: false, error: "Internal Server Error" });
   }
 });
 
-
 module.exports = router;
-
