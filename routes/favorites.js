@@ -67,7 +67,7 @@ router.get("/isFavorite/:token/:_id", async (req, res) => {
 
     // Vérification si le médicament existe déjà dans les favoris
     const isDrugFavorite = user.favorites.some(
-      (favorite) => favorite._id.toString() === drugId
+      (favorite) => favorite.drug_id.toString() === drugId.toString()
     );
 
     res.json({ result: true, isFavorite: isDrugFavorite });
