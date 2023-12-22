@@ -75,7 +75,7 @@ router.post("/signin", (req, res) => {
       console.log("dans le back ", data);
       res.json({ result: true, token: data.token, username: data.username });
     } else {
-      res.json({ result: false, error: "email not found or wrong password" });
+      res.json({ result: false, error: "email invalide ou mauvais mot de passe" });
     }
   });
 });
