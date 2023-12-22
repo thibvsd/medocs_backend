@@ -90,7 +90,7 @@ router.get("/bySourceAndKeyword/:source/:keyword", async (req, res) => {
       query = {};
     }
 
-    const combinedArticles = await Article.find(query);
+    const combinedArticles = await Article.find(query).limit(10);
     res.json({ combinedArticles: combinedArticles });
   } catch (error) {
     console.error(error);
