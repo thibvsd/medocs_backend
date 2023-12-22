@@ -72,7 +72,6 @@ router.post("/signin", (req, res) => {
 
   User.findOne({ email: req.body.email }).then((data) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      console.log("dans le back ", data);
       res.json({ result: true, token: data.token, username: data.username });
     } else {
       res.json({ result: false, error: "email invalide ou mauvais mot de passe" });
