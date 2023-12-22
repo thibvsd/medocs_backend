@@ -28,7 +28,9 @@ router.get("/query3characters/:query", async (req, res) => {
 // Récupère la data grâce à l'ID du medoc
 router.get("/byId/:id", async (req, res) => {
   try {
-    const donneesDrug = await Drug.findOne({ _id: req.params.id });
+    const donneesDrug = await Drug.findOne({ _id: req.params.id }).populate(
+      "classification"
+    )
     res.json({ drug: donneesDrug });
   } catch (error) {
     console.error(error);
