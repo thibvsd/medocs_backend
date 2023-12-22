@@ -8,7 +8,7 @@ router.post("/addLastSearch/:token", async (req, res) => {
   const user = await User.findOne({ token: req.params.token });
 
   // Vérifie si l'ID du médicament est déjà présent dans la liste search
-  const isIdAlreadyInSearch = user.search.some((item) => item.drug_id === req.body._id);
+  const isIdAlreadyInSearch = user.search.some((item) => item.drug_id.toString() === req.body._id.toString());
 
   if (isIdAlreadyInSearch) {
     // Si l'ID est déjà enregistré, renvoie une réponse sans effectuer de modifications
