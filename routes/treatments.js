@@ -154,8 +154,11 @@ router.get("/:token", async (req, res) => {
     const userToken = req.params.token;
 
     // Recherche des favoris d'un utilisateur par token avec populate sur la clé étrangère 'favorites'
-    const data = await User.findOne({ token: userToken }).populate('treatment.drugs.drug_id');
-
+    const data = await User.findOne({ token: userToken })
+      .populate({
+        path: 'treatment.drugs.drug_id',
+        select: '_id name', // Champs que vous souhaitez récupérer
+      });
     res.json({ result: true, treatment: data.treatment });
   } catch (error) {
     console.error(error);

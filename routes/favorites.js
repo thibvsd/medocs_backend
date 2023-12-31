@@ -96,6 +96,7 @@ router.get("/loadFavorite/:token", async (req, res) => {
         name: favorite.drug_id.name,
       };
     });
+    console.log("route idandname",idAndName);
 
     res.json({ result: true, idAndName: idAndName });
   } catch (error) {
