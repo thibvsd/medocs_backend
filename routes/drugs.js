@@ -48,7 +48,8 @@ router.get("/byName/:name", async (req, res) => {
     const donneesDrug = await Drug.find({
       name: { $regex: new RegExp(name, "i") },
     });
-    // console.log(donneesDrug);
+
+    console.log(donneesDrug);
 
     // Map pour alléger la réponse et n'extraire que les name et ID :
     const drugsFound = donneesDrug.map(({ _id, name }) => ({ _id, name }));

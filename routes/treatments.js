@@ -89,42 +89,33 @@ router.delete("/deletePrescription/:token/", async (req, res) => {
 });
 
 
-// Route qui met à jour la raison médicale (quand clique sur Save en bas sur TreatmentsScreen)
-// !!! A METTRE A JOUR POUR QUE CA SAUVEGARDE EGALEMENT LE DOSAGE 
-router.post("/saveTreatment/:token", async (req, res) => {
+// Route pour sauvegarder la dose d'un médicament
+router.post('/saveDose/:token', async (req, res) => {
   try {
-    const user = await User.findOne({ token: req.params.token }).populate("treatment.drugs");
-    console.log(user.treatment);
+    const user = await User.findOne({ token: req.params.token }).populate('treatment.drugs.drug_id');
 
     if (!user) {
-      return res.json({ result: false, error: "Utilisateur non connecté" });
+      return res.json({ result: false, error: 'Utilisateur non connecté' });
     }
 
-    // Met à jour la raison médicale avec la nouvelle valeur
-    user.treatment.med_reason = req.body.med_reason;
-    // console.log("la: " + user.treatment.drugs.find(
-    //   (drug) => drug.drug_id === req.body.drug_id
-    // ));
-    // user.treatment.drugs.find(
-    //   (drug) => String(drug.drug_id) === req.body.drug_id
-    // ).daily_presc = req.body.daily_presc;
+    const foundDrug = user.treatment.drugs.find(
+      (drug) => drug.drug_id._id.toString() === req.body.drugId.toString()
+    );
 
-    req.body.drugs.forEach((updatedDrug) => {
-      const foundDrug = user.treatment.drugs.find(
-        (drug) => String(drug.drug_id) === updatedDrug.drug_id
-      );
-        foundDrug.daily_presc = updatedDrug.daily_presc;
-    });
-
-    // Sauvegarde les modifications
-    await user.save();
-
-    res.json({ result: true, medReason: user.treatment.med_reason });
+    if (foundDrug) {
+      foundDrug.daily_presc = req.body.dose.toString();
+      // Sauvegarde les modifications
+      await user.save();
+      res.json({ result: true });
+    } else {
+      res.json({ result: false, error: 'Médicament non trouvé' });
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ result: false, error: "Internal Server Error" });
+    res.status(500).json({ result: false, error: 'Internal Server Error' });
   }
 });
+
 
 router.post("/updateDrugTreatment/:token", async (req, res) => {
   try {
@@ -160,6 +151,7 @@ router.get("/:token", async (req, res) => {
         select: '_id name', // Champs que vous souhaitez récupérer
       });
     res.json({ result: true, treatment: data.treatment });
+    console.log("treatment load back", data.treatment);
   } catch (error) {
     console.error(error);
     res.status(500).json({ result: false, error: "Internal Server Error" });
