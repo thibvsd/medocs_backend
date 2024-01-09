@@ -5,7 +5,7 @@ const Drug = require("../models/drugs");
 // Récupère les noms des medocs
 router.get("/allNames", (req, res) => {
   Drug.find()
-    .limit(10)
+    .limit(30)
     .then((data) => {
       const namesAndId = data.map((drug) => ({
         name: drug.name,
@@ -46,10 +46,7 @@ router.get("/byName/:name", async (req, res) => {
     }
     const donneesDrug = await Drug.find({
       name: { $regex: new RegExp(name, "i") },
-    });
-
-    console.log(donneesDrug);
-
+    }).limit(15);
     // Map pour alléger la réponse et n'extraire que les name et ID :
     const drugsFound = donneesDrug.map(({ _id, name }) => ({ _id, name }));
     res.json(drugsFound);

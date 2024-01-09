@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
 
-
 const drugSchema = mongoose.Schema({
   drug_id : {type: mongoose.Schema.Types.ObjectId,
     ref: 'drugs',},
@@ -9,21 +8,21 @@ const drugSchema = mongoose.Schema({
 });
 
 const prescriptionSchema = mongoose.Schema({
-presc_img: String,
+  presc_img: String,
 })
 
 const treatmentSchema = mongoose.Schema({
   med_reason: String,
   drugs: [drugSchema],
   prescription: [prescriptionSchema],
- });
+});
 
- const favoritesSchema = mongoose.Schema({
+const favoritesSchema = mongoose.Schema({
   drug_id : {type: mongoose.Schema.Types.ObjectId,
     ref: 'drugs',}
 });
 
- const searchSchema = mongoose.Schema({
+const searchSchema = mongoose.Schema({
   drug_id : {type: mongoose.Schema.Types.ObjectId,
     ref: 'drugs',}
 });
