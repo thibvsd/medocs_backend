@@ -5,8 +5,6 @@ const Drug = require("../models/drugs");
 const Article = require("../models/articles");
 const Classification = require("../models/classifications");
 
-
-
 // Récupère la data actu d'un médoc grâce à l'ID du medoc
 router.get("/byId/:drug_id", async (req, res) => {
   const drug_id = req.params.drug_id;
@@ -15,35 +13,6 @@ router.get("/byId/:drug_id", async (req, res) => {
     const articlesById = await Article.find({ drug_id: drug_id });
 
     res.json({ drugArticles: articlesById });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-});
-
-// Récupère la data actu d'une famille de médocs (="label" de la collection classification)
-router.get("/byLabel/:label", async (req, res) => {
-  try {
-    const label = req.body.label;
-
-    // Utilisation de populate pour récupérer les données et les stocker dans articlesByLabel
-    const articlesByLabel = await Article.find({})
-      .populate({
-        path: "drug_id",
-        model: "Drug",
-        populate: {
-          path: "classification",
-          model: "Classification",
-        },
-      })
-      .exec();
-
-    // Filtrer les articles par la famille spécifiée (label)
-    const filteredArticles = articlesByLabel.filter((article) => {
-      return article.drug_id.classification.label === label;
-    });
-
-    res.json({ articlesByLabel: filteredArticles });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur serveur" });
@@ -90,7 +59,26 @@ router.get("/bySourceAndKeyword/:source/:keyword", async (req, res) => {
       query = {};
     }
 
-    const combinedArticles = await Article.find(query).limit(10);
+    //const combinedArticles = await Article.find(query).limit(10);
+
+    const combinedArticles = await Article.aggregate([
+      // Étape 1: Filtrer les documents
+      { $match: query },
+      
+      // Étape 2: Regrouper les documents par titre, en prenant le premier document de chaque groupe
+      { $group: { 
+          _id: "$title",  // _id dans $group est utilisé pour la distinction
+          doc: { $first: "$$ROOT" } // $$ROOT représente le document original
+      }},
+      
+      // Étape 3: Préparer les documents dans leur format original
+      { $replaceRoot: { newRoot: "$doc" } },
+      
+      // Étape 4: Appliquer la limite
+      { $limit: 10 }
+    ]);
+
+
     res.json({ combinedArticles: combinedArticles });
   } catch (error) {
     console.error(error);
@@ -121,27 +109,7 @@ router.get("/latestNews", async (req, res) => {
   }
 });
 
-// route pour envoyer des nouveaux articles pour pouvoir tester (inutile à terme)
-router.post("/newArticle", async (req, res) => {
-  try {
-    const newArticle = new Article({
-      title: req.body.title,
-      date: req.body.date,
-      source: req.body.source,
-      content: req.body.content,
-      illustration: req.body.img,
-      url: req.body.url,
-      drug_id: req.body._id,
-    });
-    await newArticle.save();
-    res.json({ message: "Article ajoute avec succes" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-});
-
-// Définis la route pour récupérer toutes les sources
+// Définit la route pour récupérer toutes les sources
 router.get("/sources", async (req, res) => {
   try {
     // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
@@ -155,24 +123,7 @@ router.get("/sources", async (req, res) => {
   }
 });
 
-// Définis la route pour récupérer toutes les sources
-router.get('/labels', async (req, res) => {
-  try {
-    // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
-    const labels = await Classification.distinct("label", {
-      label: {
-        $regex: /^[^vz]$/i, // Expression régulière pour exclure les labels contenant 'v', 'z'
-      },
-    });
-
-    // Renvoie la liste des sources en réponse
-    res.json({ result: true, labels });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ result: false, error: "Internal Server Error" });
-  }
-});
-
+// Définis la route pour récupérer toutes les familles de medocs
 router.get("/codes", async (req, res) => {
   try {
     // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
@@ -188,7 +139,6 @@ router.get("/codes", async (req, res) => {
         label: 1, // Inclut uniquement le champ label dans le résultat
       }
     ).sort({ label: 1 });
-    console.log("back", codes);
     // Renvoie la liste des sources en réponse
     res.json({ result: true, codes });
   } catch (error) {

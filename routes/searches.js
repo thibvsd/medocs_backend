@@ -2,7 +2,6 @@ var express = require("express");
 const User = require("../models/users");
 var router = express.Router();
 
-
 // Route qui enregistre la dernière recherche de médicament
 router.post("/addLastSearch/:token", async (req, res) => {
   const user = await User.findOne({ token: req.params.token });
@@ -29,16 +28,12 @@ router.post("/addLastSearch/:token", async (req, res) => {
     });
 });
 
-
-
-
-// Route qui récupère les 5 dernières recherches d'un utilisateur
+// Route qui récupère les 5 dernières recherches d'un utilisateur (limite définie à 5 dans le addFavorite)
 router.get("/last5Searches/:token", async (req, res) => {
   try {
     const userToken = req.params.token;
     // Recherche des favoris d'un utilisateur par token avec populate sur la clé étrangère 'favorites'
     const data = await User.findOne({ token: userToken }).populate('search.drug_id');
-console.log(data)
     res.json({ result: true, search: data.search });
   } catch (error) {
     console.error(error);
@@ -50,10 +45,9 @@ console.log(data)
 router.get("/lastSearch/:token", async (req, res) => {
   try {
     const userToken = req.params.token;
-
     // Recherche du premier élément du tableau 
     const data = await User.findOne({ token: userToken })
-      .select({ search: { $slice: 1 } }) // $slice pour récupérer seulement le 1er élément
+      .select({ search: { $slice: 1 } }) // opérateur $slice mongodb qui spécifie le nombre d'élément à récupérer dans le résultat de select 
       .populate('search');
 
     if (data && data.search && data.search.length > 0) {

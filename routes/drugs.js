@@ -21,7 +21,6 @@ router.get("/query3characters/:query", async (req, res) => {
   const regex = new RegExp(`${req.params.query}`, "i"); // Regex pour rechercher les noms commençant par la requête
   const data = await Drug.find({ name: regex }, "name _id").limit(10);
   const namesAndId = data.map((drug) => ({ name: drug.name, _id: drug._id }));
-  console.log('[Names & ID]', namesAndId);
   res.json({ namesAndId });
 });
 

@@ -35,13 +35,12 @@ router.delete("/deleteFavorite/:token/:_id", async (req, res) => {
     res.status(500).json({ result: false, error: "Internal Server Error" });
   }
 });
-
+//ajoute un médicament favori dans le tableau de clé étrangère favorites
 router.post("/addFavorites/:token", async (req, res) => {
   const user = await User.findOne({ token: req.params.token });
-  // Ajoute l'ID au début de la liste en limitant à 5 éléments
+  // Ajoute l'ID au début de la liste
   user.favorites.unshift({ drug_id: req.body.favo });
-
-  // Sauvegarde les modifications dans la base de données
+  // Sauvegarde du user avecles modifications dans la base de données
   user
     .save()
     .then(() => {
@@ -87,8 +86,6 @@ router.get("/loadFavorite/:token", async (req, res) => {
       path: "favorites.drug_id",
       select: "_id name", // Sélectionne uniquement les champs _id et name
     });
-    console.log("data route favorite", data);
-
     // Transformation des résultats pour obtenir un format spécifique
     const idAndName = data.favorites.map((favorite) => {
       return {
@@ -96,8 +93,6 @@ router.get("/loadFavorite/:token", async (req, res) => {
         name: favorite.drug_id.name,
       };
     });
-    console.log("route idandname",idAndName);
-
     res.json({ result: true, idAndName: idAndName });
   } catch (error) {
     console.error(error);

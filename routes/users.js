@@ -9,12 +9,10 @@ const bcrypt = require("bcrypt");
 
 //Route pour créer un nouvel utilisateur
 router.post("/signup", (req, res) => {
-  console.log(req.body);
   if (!checkBody(req.body, ["username", "email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-
   // Check si l'utilisateur n'est pas deja enregistre dans la base de données
   User.findOne({ username: req.body.username }).then((data) => {
     //si utilisateur non enregistré
@@ -34,7 +32,6 @@ router.post("/signup", (req, res) => {
         res.json({ result: false, error: "Invalid weight" });
         return;
       }
-
       const hash = bcrypt.hashSync(req.body.password, 10);
       const newUser = new User({
         username: req.body.username,
@@ -69,7 +66,6 @@ router.post("/signin", (req, res) => {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-
   User.findOne({ email: req.body.email }).then((data) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       res.json({ result: true, token: data.token, username: data.username });
@@ -88,7 +84,6 @@ router.get("/details/:token", (req, res) => {
     res.json({ result: false });
   });
 });
-
 
 // Route pour mettre à jour les données utilisateur
 router.post("/settings/:token", async (req, res) => {
