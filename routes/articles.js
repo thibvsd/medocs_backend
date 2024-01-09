@@ -59,8 +59,7 @@ router.get("/bySourceAndKeyword/:source/:keyword", async (req, res) => {
       query = {};
     }
 
-    //const combinedArticles = await Article.find(query).limit(10);
-
+    //Eliminer les doublons
     const combinedArticles = await Article.aggregate([
       // Étape 1: Filtrer les documents
       { $match: query },
@@ -77,8 +76,6 @@ router.get("/bySourceAndKeyword/:source/:keyword", async (req, res) => {
       // Étape 4: Appliquer la limite
       { $limit: 10 }
     ]);
-
-
     res.json({ combinedArticles: combinedArticles });
   } catch (error) {
     console.error(error);
