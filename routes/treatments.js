@@ -11,7 +11,6 @@ router.post("/addDrugTreatment/:token", async (req, res) => {
       return res.json({ result: false, error: "Utilisateur non connecté" });
     }
     const drugTreatment = { drug_id: req.body._id, daily_presc:"" };
-    console.log(user.treatement);
     user.treatment.drugs.push(drugTreatment);
 
     await user.save();
@@ -54,7 +53,6 @@ router.post("/addPrescription/:token", async (req, res) => {
       return res.json({ result: false, error: "Utilisateur non connecté" });
     }
     const prescriptionTreatment = { presc_img: req.body.presc_img };
-    console.log(user.treatement);
     user.treatment.prescription.push(prescriptionTreatment);
 
     await user.save();
@@ -87,7 +85,6 @@ router.delete("/deletePrescription/:token/", async (req, res) => {
     res.status(500).json({ result: false, error: "Internal Server Error" });
   }
 });
-
 
 // Route pour sauvegarder la dose d'un médicament
 router.post('/saveDose/:token', async (req, res) => {
@@ -139,7 +136,6 @@ router.post("/updateDrugTreatment/:token", async (req, res) => {
 });
 
 // Récupère les traitements d'un utilisateur
-
 router.get("/:token", async (req, res) => {
   try {
     const userToken = req.params.token;
@@ -147,8 +143,8 @@ router.get("/:token", async (req, res) => {
     // Recherche des favoris d'un utilisateur par token avec populate sur la clé étrangère 'favorites'
     const data = await User.findOne({ token: userToken })
       .populate({
-        path: 'treatment.drugs.drug_id',
-        select: '_id name', // Champs que vous souhaitez récupérer
+        path: 'treatment.drugs.drug_id', //path: chemin du champ qui contient la réference à la clé étrangère
+        select: '_id name', //select: liste de champs séparés par des espaces à sélectionner 
       });
     res.json({ result: true, treatment: data.treatment });
     console.log("treatment load back", data.treatment);
