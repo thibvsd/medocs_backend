@@ -21,7 +21,7 @@ router.get("/byId/:drug_id", async (req, res) => {
 
 // Récupère la data actu d'une source spécifiée
 router.get("/byId/:source", (req, res) => {
-  const source = req.params.source;
+ const source = req.params.source;
  const sourceArticles = Article.filter(item => item.source.includes(source));
  res.json({ sourceArticles: sourceArticles });
 });
@@ -92,10 +92,8 @@ router.get("/latestNews", async (req, res) => {
       {
         $group: {
           _id: "$url", // Regroupement par URL
-          latestArticle: { $first: "$$ROOT" }, // Sélection du 1er article de chaque groupe
         },
       },
-      { $replaceRoot: { newRoot: "$latestArticle" } }, // Remplacer la racine du document par l'article sélectionné
       { $sort: { date: -1 } }, // Tri par date décroissante
       { $limit: 3 },
     ]).exec();
@@ -105,13 +103,11 @@ router.get("/latestNews", async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
-// Définit la route pour récupérer toutes les sources
+// Définit la route pour récupérer en distinct toutes les sources et alimenter la zone input source de la homepage
 router.get("/sources", async (req, res) => {
   try {
     // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
     const sources = await Article.distinct("source");
-
     // Renvoie la liste des sources en réponse
     res.json({ result: true, sources });
   } catch (error) {
