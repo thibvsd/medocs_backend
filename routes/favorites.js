@@ -68,7 +68,7 @@ router.get("/isFavorite/:token/:_id", async (req, res) => {
     const isDrugFavorite = user.favorites.some(
       (favorite) => favorite.drug_id.toString() === drugId.toString()
     );
-
+console.log('favorite',isDrugFavorite);
     res.json({ result: true, isFavorite: isDrugFavorite });
   } catch (error) {
     console.error(error);

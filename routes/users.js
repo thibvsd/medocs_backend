@@ -107,19 +107,4 @@ router.post("/settings/:token", async (req, res) => {
   }
 });
 
-// Route pour enregistrer le nouveau mot de passe
-// router.post("/changepassword", (req, res) => {
-//   if (!checkBody(req.body, ["password"])) {
-//     res.json({ result: false, error: "Missing or empty fields" });
-//     return;
-//   }
-
-//   User.findOne({ email: req.body.email }).then((data) => {
-//     if (data) {
-//       const hash = bcrypt.hashSync(req.body.password, 10);
-//       User.save({ password: hash });
-//       res.json({ result: true, token: data.token });
-//   }})
-// });
-
 module.exports = router;
