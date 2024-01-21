@@ -155,17 +155,17 @@ router.get("/sources", async (req, res) => {
   }
 });
 
-// Définis la route pour récupérer toutes les sources
+// Définis la route pour récupérer toutes les familles
 router.get('/labels', async (req, res) => {
   try {
-    // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
+    // Utilise la méthode distinct de Mongoose pour récupérer toutes les familles sans doublons
     const labels = await Classification.distinct("label", {
       label: {
-        $regex: /^[^vz]$/i, // Expression régulière pour exclure les labels contenant 'v', 'z'
+        $regex: /^[^vz]$/i, // Expression régulière pour exclure les familles contenant 'v', 'z'
       },
     });
 
-    // Renvoie la liste des sources en réponse
+    // Renvoie la liste des familles en réponse
     res.json({ result: true, labels });
   } catch (error) {
     console.error(error);
@@ -175,7 +175,7 @@ router.get('/labels', async (req, res) => {
 
 router.get("/codes", async (req, res) => {
   try {
-    // Utilise la méthode distinct de Mongoose pour récupérer toutes les sources sans doublons
+    // Utilise la méthode distinct de Mongoose pour récupérer tous les codes famille sans doublons
     const codes = await Classification.find(
       {
         $and: [
@@ -189,7 +189,7 @@ router.get("/codes", async (req, res) => {
       }
     ).sort({ label: 1 });
     console.log("back", codes);
-    // Renvoie la liste des sources en réponse
+    // Renvoie la liste des codes en réponse
     res.json({ result: true, codes });
   } catch (error) {
     console.error(error);

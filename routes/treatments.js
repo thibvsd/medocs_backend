@@ -125,7 +125,7 @@ router.post("/updateDrugTreatment/:token", async (req, res) => {
       return res.json({ result: false, error: "Utilisateur non connecté" });
     }
 
-    // Met à jour le dosage du médicament
+    // Met à jour la raison médicale
     user.treatment.med_reason = req.body.med_reason;
 
     // Sauvegarde les modifications
